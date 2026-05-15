@@ -1,15 +1,13 @@
 #!/usr/bin/python3
 
-################################################################################
 import urllib.parse
+from deep_translator import GoogleTranslator
+
 
 def generate_google_translate_link(text, source_lang="auto", target_lang="en"):
     encoded_text = urllib.parse.quote(text)
     return f"https://translate.google.com/?sl={source_lang}&tl={target_lang}&text={encoded_text}&op=translate"
 
-
-################################################################################
-from deep_translator import GoogleTranslator
 
 def translate_text_sync(text, source_lang='auto', target_lang='en'):
     '''
