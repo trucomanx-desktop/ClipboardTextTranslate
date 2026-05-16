@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clipboard_text_translate"
+version = "0.1.8"
+description = "Program that collects text from the clipboard and translates it."
+readme = "README.md"
+authors = [{name = "Fernando Pujaico Rivera", email = "fernando.pujaico.rivera@gmail.com"}]
+maintainers = [{name = "Fernando Pujaico Rivera", email = "fernando.pujaico.rivera@gmail.com"}]
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "GPL-3.0-only WITH Classpath-Exception-2.0 OR BSD-3-Clause"
+license-files = ["LICENSE"]
+keywords = ["ocr", "pdf", "book"]
+dependencies = [
+    "PyQt5",
+    "deep-translator"
+]
+
+[project.urls]
+"Bug Reports" = "https://github.com/trucomanx/ClipboardTextTranslate/issues"
+"Funding" = "https://trucomanx.github.io/en/funding.html"
+"Source" = "https://github.com/trucomanx/ClipboardTextTranslate"
+
+[project.scripts]
+"clipboard-text-translate-indicator" = "clipboard_text_translate.indicator:main"
+
+[tool.setuptools]
+packages = ["clipboard_text_translate", "clipboard_text_translate.modules"]
+
+[tool.setuptools.package-data]
+"clipboard_text_translate" = ["icons/*.png"]

@@ -11,14 +11,22 @@ import platform
 import os
 
 
-from clipboard_text_translate.desktop import create_desktop_file, create_desktop_directory, create_desktop_menu
+from clipboard_text_translate.desktop import create_desktop_file
+from clipboard_text_translate.desktop import create_desktop_directory
+from clipboard_text_translate.desktop import create_desktop_menu
+from clipboard_text_translate.modules.wabout import show_about_window
+from clipboard_text_translate.modules.resources import resource_path
 import clipboard_text_translate.modules.lib_files as lib_files
 import clipboard_text_translate.modules.lib_translate as lib_translate
 import clipboard_text_translate.about as about
 
 
-CONFIG_FILE = "~/.config/clipboard_text_translate/config.json"
-config_file_path = os.path.expanduser(CONFIG_FILE)
+CONFIG_PATH = os.path.join( os.path.expanduser("~"),
+                            ".config", 
+                            about.__package__, 
+                            "config.json" )
+                            
+config_file_path = os.path.expanduser(CONFIG_PATH)
 config_data = {
     "GoogleTranslateLauncher": {
         "To english": "en",
@@ -67,104 +75,6 @@ def show_notification_message(title, message):
         tray_icon = app.property("tray_icon")
         if tray_icon:
             tray_icon.showMessage("⚠️ " + title + " ⚠️", message, QSystemTrayIcon.Information, 3000)
-
-class AboutWindow(QDialog):
-    """About dialog window"""
-    def __init__(self, data, logo_path, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("About")
-        self.setMinimumSize(500, 300)
-        
-        # Create layout
-        layout = QVBoxLayout(self)
-        
-        # Logo
-        logo_label = QLabel()
-        pixmap = QPixmap(logo_path)
-        pixmap = pixmap.scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        logo_label.setPixmap(pixmap)
-        logo_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(logo_label)
-        
-        # Description
-        description_label = QLabel(f"<b>{data['description']}</b>")
-        description_label.setWordWrap(True)
-        description_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        layout.addWidget(description_label)
-        
-        # Add separator
-        separator = QLabel()
-        separator.setFrameShape(QLabel.HLine)
-        separator.setFrameShadow(QLabel.Sunken)
-        layout.addWidget(separator)
-        
-        # Package info
-        package_label = QLabel(f"Package: {data['package']}")
-        package_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        package_label.setAlignment(Qt.AlignLeft)
-        layout.addWidget(package_label)
-        
-        # Program info
-        program_label = QLabel(f"Program: {data['linux_indicator']}")
-        program_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        program_label.setAlignment(Qt.AlignLeft)
-        layout.addWidget(program_label)
-        
-        # Version info
-        version_label = QLabel(f"Version: {data['version']}")
-        version_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        version_label.setAlignment(Qt.AlignLeft)
-        layout.addWidget(version_label)
-        
-        # Author info
-        author_label = QLabel(f"Author: {data['author']}")
-        author_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        author_label.setAlignment(Qt.AlignLeft)
-        layout.addWidget(author_label)
-        
-        # Email info
-        email_label = QLabel(f"Email: <a href=\"mailto:{data['email']}\">{data['email']}</a>")
-        email_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        email_label.setOpenExternalLinks(True)
-        email_label.setAlignment(Qt.AlignLeft)
-        layout.addWidget(email_label)
-        
-        # Add another separator
-        separator2 = QLabel()
-        separator2.setFrameShape(QLabel.HLine)
-        separator2.setFrameShadow(QLabel.Sunken)
-        layout.addWidget(separator2)
-        
-        # Source URL
-        source_label = QLabel(f"Source: <a href=\"{data['url_source']}\">{data['url_source']}</a>")
-        source_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        source_label.setOpenExternalLinks(True)
-        source_label.setAlignment(Qt.AlignLeft)
-        layout.addWidget(source_label)
-        
-        # Funding URL
-        funding_label = QLabel(f"Funding: <a href=\"{data['url_funding']}\">{data['url_funding']}</a>")
-        funding_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        funding_label.setOpenExternalLinks(True)
-        funding_label.setAlignment(Qt.AlignLeft)
-        layout.addWidget(funding_label)
-        
-        # Bugs URL
-        bugs_label = QLabel(f"Bugs: <a href=\"{data['url_bugs']}\">{data['url_bugs']}</a>")
-        bugs_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        bugs_label.setOpenExternalLinks(True)
-        bugs_label.setAlignment(Qt.AlignLeft)
-        layout.addWidget(bugs_label)
-        
-        # OK Button
-        ok_button = QPushButton("OK")
-        ok_button.clicked.connect(self.accept)
-        layout.addWidget(ok_button)
-
-def show_about_window(data, logo_path):
-    dialog = AboutWindow(data, logo_path)
-    dialog.exec_()
-
 
 class MessageDialog(QDialog):
     """Display a message with copyable text and an OK button"""
@@ -243,19 +153,19 @@ def show_about():
     data = {
         "version": about.__version__,
         "package": about.__package__,
-        "linux_indicator": about.__linux_indicator__,
+        "program_name": about.__linux_indicator__,
         "author": about.__author__,
         "email": about.__email__,
         "description": about.__description__,
         "url_source": about.__url_source__,
         "url_funding": about.__url_funding__,
+        "url_doc": about.__url_doc__,
         "url_bugs": about.__url_bugs__
     }
     
-    base_dir_path = os.path.dirname(os.path.abspath(__file__))
-    logo_path = os.path.join(base_dir_path, 'icons', 'logo.png')
+    icon_path = resource_path('icons', 'logo.png')
     
-    show_about_window(data, logo_path)
+    show_about_window(data, icon_path)
 
 class ClipboardTextTranslate(QApplication):
     def __init__(self, argv):
@@ -264,11 +174,10 @@ class ClipboardTextTranslate(QApplication):
         
         
         # Get base directory for icons
-        base_dir_path = os.path.dirname(os.path.abspath(__file__))
-        icon_path = os.path.join(base_dir_path, 'icons', 'logo.png')
+        self.icon_path = resource_path('icons', 'logo.png')
         
         # Create system tray icon
-        self.tray_icon = QSystemTrayIcon(QIcon(icon_path))
+        self.tray_icon = QSystemTrayIcon(QIcon(self.icon_path))
         self.tray_icon.setToolTip("Clipboard Text Translate")
 
         # Menu
@@ -352,6 +261,7 @@ class ClipboardTextTranslate(QApplication):
         
         self.tray_icon.setContextMenu(self.menu)
         self.tray_icon.show()
+
 
 
 def main():
