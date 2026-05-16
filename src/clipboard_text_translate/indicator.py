@@ -128,8 +128,7 @@ def edit_config():
     lib_files.open_from_filepath(config_file_path)
 
 def open_url_help():
-    url = "https://github.com/trucomanx/ClipboardTextTranslate/blob/main/doc/README.md"
-    show_notification_message("open_url_help", url)
+    show_notification_message("open_url_help", about.__url_doc__)
     QDesktopServices.openUrl(QUrl(url))
 
 def on_action_googletranslate(lang_code):

@@ -2,7 +2,7 @@
 
 Program that translate text.
 
-![logo](https://raw.githubusercontent.com/trucomanx/ClipboardTextTranslate/main/screenshot.png)
+![logo](https://raw.githubusercontent.com/trucomanx-desktop/ClipboardTextTranslate/main/screenshot.png)
 
 ## 1. Installing
 

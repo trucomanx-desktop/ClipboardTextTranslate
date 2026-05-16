@@ -23,9 +23,9 @@ dependencies = [
 ]
 
 [project.urls]
-"Bug Reports" = "https://github.com/trucomanx/ClipboardTextTranslate/issues"
+"Bug Reports" = "https://github.com/trucomanx-desktop/ClipboardTextTranslate/issues"
 "Funding" = "https://trucomanx.github.io/en/funding.html"
-"Source" = "https://github.com/trucomanx/ClipboardTextTranslate"
+"Source" = "https://github.com/trucomanx-desktop/ClipboardTextTranslate"
 
 [project.scripts]
 "clipboard-text-translate-indicator" = "clipboard_text_translate.indicator:main"
