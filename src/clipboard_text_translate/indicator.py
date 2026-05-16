@@ -16,7 +16,8 @@ from clipboard_text_translate.desktop import create_desktop_directory
 from clipboard_text_translate.desktop import create_desktop_menu
 from clipboard_text_translate.modules.wabout import show_about_window
 from clipboard_text_translate.modules.resources import resource_path
-import clipboard_text_translate.modules.lib_files as lib_files
+import clipboard_text_translate.modules.configure     as configure 
+import clipboard_text_translate.modules.lib_files     as lib_files
 import clipboard_text_translate.modules.lib_translate as lib_translate
 import clipboard_text_translate.about as about
 
@@ -25,9 +26,8 @@ CONFIG_PATH = os.path.join( os.path.expanduser("~"),
                             ".config", 
                             about.__package__, 
                             "config.json" )
-                            
-config_file_path = os.path.expanduser(CONFIG_PATH)
-config_data = {
+
+DEFAULT_CONTENT = {
     "GoogleTranslateLauncher": {
         "To english": "en",
         "To spanish": "es",
@@ -41,25 +41,9 @@ config_data = {
     
 }
 
+configure.verify_default_config(CONFIG_PATH,default_content=DEFAULT_CONTENT)
 
-try:
-    if not os.path.exists(config_file_path):
-        os.makedirs(os.path.dirname(config_file_path), exist_ok=True)
-        
-        with open(config_file_path, "w", encoding="utf-8") as arquivo:
-            json.dump(config_data, arquivo, indent=4)
-        print(f"Arquivo criado em: {config_file_path}")
-        
-    with open(config_file_path, "r") as arquivo:
-        config_data = json.load(arquivo)
-    
-except FileNotFoundError:
-    print(f"Erro: O arquivo '{config_file_path}' não foi encontrado.")
-    sys.exit()
-    
-except json.JSONDecodeError:
-    print(f"Erro: O arquivo '{config_file_path}' não contém um JSON válido.")
-    sys.exit()
+CONFIG=configure.load_config(CONFIG_PATH)
 
 ################################################################################
 ################################################################################
@@ -125,7 +109,7 @@ def get_clipboard_text():
     return clipboard.text()
 
 def edit_config():
-    lib_files.open_from_filepath(config_file_path)
+    lib_files.open_from_filepath(CONFIG_PATH)
 
 def open_url_help():
     show_notification_message("open_url_help", about.__url_doc__)
@@ -185,11 +169,11 @@ class ClipboardTextTranslate(QApplication):
         # Criar submenu para traduções
         self.translate_menu = QMenu("📋 Google Translate launcher", self.menu)
 
-        translate_data = config_data.get("GoogleTranslateLauncher", {})        
+        translate_data = CONFIG.get("GoogleTranslateLauncher", {})        
         for label, lang_code in translate_data.items():
             # Translate with google
             action = QAction("\t"+label, self.menu)
-            action.setIcon(QIcon.fromTheme("emblem-default"))
+            action.setIcon(QIcon(resource_path('icons', 'emblem-default.png')))
             action.triggered.connect(lambda checked, code=lang_code: on_action_googletranslate(code))
             self.translate_menu.addAction(action)
         
@@ -201,11 +185,11 @@ class ClipboardTextTranslate(QApplication):
         # Criar submenu para traduções
         self.raw_translate_menu = QMenu("📋 Translate raw text", self.menu)
         
-        raw_translate_data = config_data.get("RawTranslateLauncher", {})
+        raw_translate_data = CONFIG.get("RawTranslateLauncher", {})
         for label, lang_code in raw_translate_data.items():
             # Translate with google
             action = QAction("\t"+label, self.menu)
-            action.setIcon(QIcon.fromTheme("emblem-default"))
+            action.setIcon(QIcon(resource_path('icons', 'emblem-default.png')))
             action.triggered.connect(lambda checked, code=lang_code: on_action_rawtranslate(code))
             self.raw_translate_menu.addAction(action)
         
@@ -220,13 +204,13 @@ class ClipboardTextTranslate(QApplication):
         
         # Add actions to program_information_submenu
         edit_config_action = QAction("\tOpen config file", self.menu)
-        edit_config_action.setIcon(QIcon.fromTheme("applications-utilities"))
+        edit_config_action.setIcon(QIcon(resource_path('icons', 'document-page-setup.png')))
         edit_config_action.triggered.connect(edit_config)
         self.program_info_submenu.addAction(edit_config_action)
         
         # Add heelp
         url_help_action = QAction("\tOpen url help", self.menu)
-        url_help_action.setIcon(QIcon.fromTheme("help-contents"))
+        url_help_action.setIcon(QIcon(resource_path('icons', 'status_help.png')))
         url_help_action.triggered.connect(open_url_help)
         self.program_info_submenu.addAction(url_help_action)
         
@@ -239,13 +223,13 @@ class ClipboardTextTranslate(QApplication):
         
         # Coffee
         coffee_action = QAction("☕ Buy me a coffee", self.menu)
-        coffee_action.setIcon(QIcon.fromTheme("emblem-favorite"))
+        coffee_action.setIcon(QIcon(resource_path('icons', 'emote-love.png')))
         coffee_action.triggered.connect(open_coffee_link)
         self.menu.addAction(coffee_action)
         
         # About
         about_action = QAction("🌟 About", self.menu)
-        about_action.setIcon(QIcon.fromTheme("help-about"))
+        about_action.setIcon(QIcon(resource_path('icons', 'status_help.png')))
         about_action.triggered.connect(show_about)
         self.menu.addAction(about_action)
         
@@ -254,7 +238,7 @@ class ClipboardTextTranslate(QApplication):
 
         # Exit        
         exit_action = QAction("❌ Exit", self.menu)
-        exit_action.setIcon(QIcon.fromTheme("application-exit"))
+        exit_action.setIcon(QIcon(resource_path('icons', 'application-exit.png')))
         exit_action.triggered.connect(self.app.quit)
         self.menu.addAction(exit_action)
         
